@@ -1,9 +1,13 @@
+body{
+    margin: 0;
+    
+}
 .container {
-    margin: auto;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     text-align: center;
-    width: 50%;
+    width: 75%;
+    height: 65%;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -11,6 +15,18 @@
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top:  50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.removeBtn {
+    background-color: red;
+}
+
+.removeBtn:hover {
+    background-color: rgb(200, 0, 0);
 }
 
 h2 {
@@ -26,7 +42,7 @@ select,
 input[type="text"] {
     margin-bottom: 10px;
     padding: 8px;
-    width: 100%;
+    width: 80%;
     box-sizing: border-box;
 }
 
@@ -55,4 +71,98 @@ button {
 
 button:hover {
     background-color: #45a049;
+}
+
+.createContainer{
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+    border-right: 1px solid lightgray;
+}
+
+.manageContainer{
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+}
+
+.categories{
+    height: 6rem;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+.tasks{
+    display: flex;
+    height: 6rem;
+    overflow-y: scroll;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.tasksList {
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 80%;
+    justify-content: space-evenly;
+    margin-bottom: 5px;
+}
+
+.categoriesList{
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    width: 60%;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.editBtn{
+    margin-left: 5px;
+}
+
+.taskBtns{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        width: 90%;
+        border: 1px solid lightgray;
+        /* Add or modify border styles as needed */
+    }
+
+    .createContainer {
+        width: 100%;
+        border-right: none;
+    }
+
+    .manageContainer {
+        width: 100%;
+        border-top: 1px solid lightgray;
+        /* Add or modify border styles as needed */
+    }
+
+    select,
+    input[type="text"] {
+        width: 100%;
+    }
+
+    .tasksList,
+    .categoriesList {
+        width: 100%;
+        border: 1px solid lightgray;
+        /* Add or modify border styles as needed */
+    }
 }

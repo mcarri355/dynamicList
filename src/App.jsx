@@ -11,7 +11,6 @@ const taskReducer = (state, action) => {
       return state.map(task =>
         task.id === action.payload.id ? { ...task, ...action.payload.updatedTask } : task
       );
-    // Add other task-related actions here (e.g., 'SET_PRIORITY', 'SET_DUE_DATE')
     case 'SET_TASKS':
       return action.payload;
     default:
@@ -40,7 +39,6 @@ const App = () => {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Load tasks and categories from local storage on mount
   useEffect(() => {
     const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
     const storedCategories = JSON.parse(localStorage.getItem('categories')) || [];
@@ -48,7 +46,6 @@ const App = () => {
     dispatchCategories({ type: 'SET_CATEGORIES', payload: storedCategories });
   }, []);
 
-  // Save tasks and categories to local storage on update
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
     localStorage.setItem('categories', JSON.stringify(categories));
@@ -84,7 +81,6 @@ const App = () => {
 
   const handleRemoveTask = taskId => {
     dispatchTasks({ type: 'REMOVE_TASK', payload: taskId });
-    // Clear editing state if the task being edited is removed
     if (editingTaskId === taskId) {
       setEditingTaskId(null);
       setNewTask({ name: '', description: '', category: '' });
@@ -113,28 +109,9 @@ const App = () => {
 
   return (
     <div className='container'>
-      <div>
-        <h2>Task List</h2>
-        <div>
-          <label>Filter by Category:</label>
-          <select value={selectedCategory} onChange={handleCategoryChange}>
-            <option value="All">All</option>
-            {categories.map(category => (
-              <option key={category.id} value={category.name}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <ul>
-          {filteredTasks.map(task => (
-            <li key={task.id}>
-              {task.name} - {task.description} - {task.category}
-              <button onClick={() => handleRemoveTask(task.id)}>Remove</button>
-              <button onClick={() => handleEditTask(task)}>Edit</button>
-            </li>
-          ))}
-        </ul>
+      <div className='createContainer'>
+        <h2>Task Creation</h2>
+        
         <div>
           <input
             type="text"
@@ -159,6 +136,7 @@ const App = () => {
               </option>
             ))}
           </select>
+          <br />
           <button onClick={handleAddTask}>
             {editingTaskId !== null ? 'Update Task' : 'Add Task'}
           </button>
@@ -166,24 +144,55 @@ const App = () => {
             <button onClick={handleCancelEdit}>Cancel Edit</button>
           )}
         </div>
+        <div>
+          <h2>Category Creation</h2>
+          <div>
+            <input
+              type="text"
+              placeholder="New Category"
+              onChange={e => setNewTask({ ...newTask, category: e.target.value })}
+            />
+            <br />
+            <button onClick={() => handleAddCategory(newTask.category)}>Add Category</button>
+          </div>
+        </div>
       </div>
-      <div>
-        <h2>Category Management</h2>
-        <ul>
+      <div className='manageContainer'>
+        <div>
+          <h2>Task Manager</h2>
+          <p>Filter by Category:</p>
+          <select value={selectedCategory} onChange={handleCategoryChange}>
+            <option value="All">All</option>
+            {categories.map(category => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <ul className='tasks'>
+          {filteredTasks.map(task => (
+            <li key={task.id} className='tasksList'>
+              {task.name} - {task.description} - {task.category}
+              <div className='taskBtns'>
+                <button className='removeBtn' onClick={() => handleRemoveTask(task.id)}>Remove</button>
+                <button className= 'editBtn' onClick={() => handleEditTask(task)}>Edit</button>
+              </div>
+                
+
+            </li>
+          ))}
+        </ul>  
+        </div>
+        <div>
+          <h2>Category Manager</h2>
+          <ul className='categories'>
           {categories.map(category => (
-            <li key={category.id}>
+            <li className='categoriesList' key={category.id}>
               {category.name}
-              <button onClick={() => handleRemoveCategory(category.id)}>Remove</button>
+              <button className='removeBtn' onClick={() => handleRemoveCategory(category.id)}>Remove</button>
             </li>
           ))}
         </ul>
-        <div>
-          <input
-            type="text"
-            placeholder="New Category"
-            onChange={e => setNewTask({ ...newTask, category: e.target.value })}
-          />
-          <button onClick={() => handleAddCategory(newTask.category)}>Add Category</button>
         </div>
       </div>
     </div>
