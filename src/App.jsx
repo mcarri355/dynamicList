@@ -26,7 +26,6 @@ const categoryReducer = (state, action) => {
       return state.filter(category => category.id !== action.payload);
     case 'SET_CATEGORIES':
       return action.payload;
-    // Add other category-related actions here (e.g., 'UPDATE_CATEGORY')
     default:
       return state;
   }
@@ -66,14 +65,12 @@ const App = () => {
     }
 
     if (editingTaskId !== null) {
-      // Update existing task
       dispatchTasks({
         type: 'UPDATE_TASK',
         payload: { id: editingTaskId, updatedTask: newTask },
       });
       setEditingTaskId(null);
     } else {
-      // Add new task
       dispatchTasks({ type: 'ADD_TASK', payload: { ...newTask, id: Date.now() } });
     }
     setNewTask({ name: '', description: '', category: '' });

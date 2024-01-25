@@ -140,7 +140,6 @@ button:hover {
         flex-direction: column;
         width: 90%;
         border: 1px solid lightgray;
-        /* Add or modify border styles as needed */
     }
 
     .createContainer {
@@ -151,7 +150,6 @@ button:hover {
     .manageContainer {
         width: 100%;
         border-top: 1px solid lightgray;
-        /* Add or modify border styles as needed */
     }
 
     select,
@@ -163,6 +161,6 @@ button:hover {
     .categoriesList {
         width: 100%;
         border: 1px solid lightgray;
-        /* Add or modify border styles as needed */
     }
+
 }
