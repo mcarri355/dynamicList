@@ -93,16 +93,11 @@ button:hover {
 .categories{
     height: 6rem;
     overflow-y: scroll;
-    display: flex;
-    flex-direction: column;
 }
 
 .tasks{
-    display: flex;
     height: 6rem;
     overflow-y: scroll;
-    flex-direction: column;
-    align-items: center;
 
 }
 

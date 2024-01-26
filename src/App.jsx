@@ -1,8 +1,10 @@
-import React, { useReducer, useState, useEffect } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import './App.css';
 
 const taskReducer = (state, action) => {
   switch (action.type) {
+    case 'SET_TASKS':
+      return action.payload;
     case 'ADD_TASK':
       return [...state, action.payload];
     case 'REMOVE_TASK':
@@ -11,8 +13,6 @@ const taskReducer = (state, action) => {
       return state.map(task =>
         task.id === action.payload.id ? { ...task, ...action.payload.updatedTask } : task
       );
-    case 'SET_TASKS':
-      return action.payload;
     default:
       return state;
   }
@@ -20,12 +20,12 @@ const taskReducer = (state, action) => {
 
 const categoryReducer = (state, action) => {
   switch (action.type) {
+    case 'SET_CATEGORIES':
+      return action.payload;
     case 'ADD_CATEGORY':
       return [...state, action.payload];
     case 'REMOVE_CATEGORY':
       return state.filter(category => category.id !== action.payload);
-    case 'SET_CATEGORIES':
-      return action.payload;
     default:
       return state;
   }
@@ -37,9 +37,20 @@ const App = () => {
 
   const [tasks, dispatchTasks] = useReducer(taskReducer, initialTasks);
   const [categories, dispatchCategories] = useReducer(categoryReducer, initialCategories);
-  const [newTask, setNewTask] = useState({ name: '', description: '', category: '' });
-  const [editingTaskId, setEditingTaskId] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [editingTaskId, setEditingTaskId] = React.useState(null);
+  const [newTaskState, newTaskDispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'SET_NEW_TASK':
+        return { ...state, ...action.payload };
+      case 'RESET_NEW_TASK':
+        return { name: '', description: '', category: '' };
+      default:
+        return state;
+    }
+  }, { name: '', description: '', category: '' });
+
+  const { name, description, category } = newTaskState;
+  const [selectedCategory, setSelectedCategory] = React.useState('All');
 
   useEffect(() => {
     const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -53,16 +64,8 @@ const App = () => {
     localStorage.setItem('categories', JSON.stringify(categories));
   }, [tasks, categories]);
 
-  const filteredTasks = selectedCategory === 'All'
-    ? tasks
-    : tasks.filter(task => task.category === selectedCategory);
-
-  const handleCategoryChange = e => {
-    setSelectedCategory(e.target.value);
-  };
-
   const handleAddTask = () => {
-    if (!newTask.name || !newTask.description || !newTask.category) {
+    if (!name || !description || !category) {
       alert("Please fill in all fields (Name, Description, and Category) to add a task.");
       return;
     }
@@ -70,35 +73,27 @@ const App = () => {
     if (editingTaskId !== null) {
       dispatchTasks({
         type: 'UPDATE_TASK',
-        payload: { id: editingTaskId, updatedTask: newTask },
+        payload: { id: editingTaskId, updatedTask: { name, description, category } },
       });
       setEditingTaskId(null);
     } else {
-      dispatchTasks({ type: 'ADD_TASK', payload: { ...newTask, id: Date.now() } });
+      dispatchTasks({ type: 'ADD_TASK', payload: { name, description, category, id: Date.now() } });
     }
-    setNewTask({ name: '', description: '', category: '' });
+
+    newTaskDispatch({ type: 'RESET_NEW_TASK' });
   };
 
   const handleRemoveTask = taskId => {
     dispatchTasks({ type: 'REMOVE_TASK', payload: taskId });
     if (editingTaskId === taskId) {
       setEditingTaskId(null);
-      setNewTask({ name: '', description: '', category: '' });
+      newTaskDispatch({ type: 'RESET_NEW_TASK' });
     }
   };
 
   const handleEditTask = task => {
     setEditingTaskId(task.id);
-    setNewTask({ ...task });
-  };
-
-  const handleCancelEdit = () => {
-    setEditingTaskId(null);
-    setNewTask({ name: '', description: '', category: '' });
-  };
-
-  const handleRemoveCategory = categoryId => {
-    dispatchCategories({ type: 'REMOVE_CATEGORY', payload: categoryId });
+    newTaskDispatch({ type: 'SET_NEW_TASK', payload: task });
   };
 
   const handleAddCategory = newCategory => {
@@ -106,6 +101,18 @@ const App = () => {
       dispatchCategories({ type: 'ADD_CATEGORY', payload: { name: newCategory, id: Date.now() } });
     }
   };
+
+  const handleRemoveCategory = categoryId => {
+    dispatchCategories({ type: 'REMOVE_CATEGORY', payload: categoryId });
+  };
+
+  const handleCategoryChange = e => {
+    setSelectedCategory(e.target.value);
+  };
+
+  const filteredTasks = selectedCategory === 'All'
+    ? tasks
+    : tasks.filter(task => task.category === selectedCategory);
 
   return (
     <div className='container'>
@@ -116,19 +123,19 @@ const App = () => {
             type="text"
             maxLength={10}
             placeholder="Task Name"
-            value={newTask.name}
-            onChange={e => setNewTask({ ...newTask, name: e.target.value })}
+            value={name}
+            onChange={e => newTaskDispatch({ type: 'SET_NEW_TASK', payload: { name: e.target.value } })}
           />
           <input
             type="text"
             maxLength={10}
             placeholder="Task Description"
-            value={newTask.description}
-            onChange={e => setNewTask({ ...newTask, description: e.target.value })}
+            value={description}
+            onChange={e => newTaskDispatch({ type: 'SET_NEW_TASK', payload: { description: e.target.value } })}
           />
           <select
-            value={newTask.category}
-            onChange={e => setNewTask({ ...newTask, category: e.target.value })}
+            value={category}
+            onChange={e => newTaskDispatch({ type: 'SET_NEW_TASK', payload: { category: e.target.value } })}
           >
             <option value="">Select Category</option>
             {categories.map(category => (
@@ -142,7 +149,10 @@ const App = () => {
             {editingTaskId !== null ? 'Update Task' : 'Add Task'}
           </button>
           {editingTaskId !== null && (
-            <button onClick={handleCancelEdit}>Cancel Edit</button>
+            <button onClick={() => {
+              setEditingTaskId(null);
+              newTaskDispatch({ type: 'RESET_NEW_TASK' });
+            }}>Cancel Edit</button>
           )}
         </div>
         <div>
@@ -152,10 +162,10 @@ const App = () => {
               maxLength={10}
               type="text"
               placeholder="New Category"
-              onChange={e => setNewTask({ ...newTask, category: e.target.value })}
+              onChange={e => newTaskDispatch({ type: 'SET_NEW_TASK', payload: { category: e.target.value } })}
             />
             <br />
-            <button onClick={() => handleAddCategory(newTask.category)}>Add Category</button>
+            <button onClick={() => handleAddCategory(newTaskState.category)}>Add Category</button>
           </div>
         </div>
       </div>
@@ -177,11 +187,11 @@ const App = () => {
                 {task.name} - {task.description} - {task.category}
                 <div className='taskBtns'>
                   <button className='removeBtn' onClick={() => handleRemoveTask(task.id)}>Remove</button>
-                  <button className= 'editBtn' onClick={() => handleEditTask(task)}>Edit</button>
+                  <button className='editBtn' onClick={() => handleEditTask(task)}>Edit</button>
                 </div>
               </li>
             ))}
-          </ul>  
+          </ul>
         </div>
         <div>
           <h2>Category Manager</h2>
