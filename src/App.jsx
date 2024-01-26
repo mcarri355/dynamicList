@@ -1,5 +1,6 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import './App.css';
+
 
 const taskReducer = (state, action) => {
   switch (action.type) {
@@ -37,7 +38,7 @@ const App = () => {
 
   const [tasks, dispatchTasks] = useReducer(taskReducer, initialTasks);
   const [categories, dispatchCategories] = useReducer(categoryReducer, initialCategories);
-  const [editingTaskId, setEditingTaskId] = React.useState(null);
+  const [editingTaskId, setEditingTaskId] = useState(null);
   const [newTaskState, newTaskDispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_NEW_TASK':
@@ -50,7 +51,7 @@ const App = () => {
   }, { name: '', description: '', category: '' });
 
   const { name, description, category } = newTaskState;
-  const [selectedCategory, setSelectedCategory] = React.useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
     const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
