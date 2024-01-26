@@ -1,5 +1,5 @@
 import React, { useReducer, useState, useEffect } from 'react';
-import './App.css'
+import './App.css';
 
 const taskReducer = (state, action) => {
   switch (action.type) {
@@ -32,8 +32,11 @@ const categoryReducer = (state, action) => {
 };
 
 const App = () => {
-  const [tasks, dispatchTasks] = useReducer(taskReducer, []);
-  const [categories, dispatchCategories] = useReducer(categoryReducer, []);
+  const initialTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  const initialCategories = JSON.parse(localStorage.getItem('categories')) || [];
+
+  const [tasks, dispatchTasks] = useReducer(taskReducer, initialTasks);
+  const [categories, dispatchCategories] = useReducer(categoryReducer, initialCategories);
   const [newTask, setNewTask] = useState({ name: '', description: '', category: '' });
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -108,16 +111,17 @@ const App = () => {
     <div className='container'>
       <div className='createContainer'>
         <h2>Task Creation</h2>
-        
         <div>
           <input
             type="text"
+            maxLength={10}
             placeholder="Task Name"
             value={newTask.name}
             onChange={e => setNewTask({ ...newTask, name: e.target.value })}
           />
           <input
             type="text"
+            maxLength={10}
             placeholder="Task Description"
             value={newTask.description}
             onChange={e => setNewTask({ ...newTask, description: e.target.value })}
@@ -145,6 +149,7 @@ const App = () => {
           <h2>Category Creation</h2>
           <div>
             <input
+              maxLength={10}
               type="text"
               placeholder="New Category"
               onChange={e => setNewTask({ ...newTask, category: e.target.value })}
@@ -167,29 +172,27 @@ const App = () => {
             ))}
           </select>
           <ul className='tasks'>
-          {filteredTasks.map(task => (
-            <li key={task.id} className='tasksList'>
-              {task.name} - {task.description} - {task.category}
-              <div className='taskBtns'>
-                <button className='removeBtn' onClick={() => handleRemoveTask(task.id)}>Remove</button>
-                <button className= 'editBtn' onClick={() => handleEditTask(task)}>Edit</button>
-              </div>
-                
-
-            </li>
-          ))}
-        </ul>  
+            {filteredTasks.map(task => (
+              <li key={task.id} className='tasksList'>
+                {task.name} - {task.description} - {task.category}
+                <div className='taskBtns'>
+                  <button className='removeBtn' onClick={() => handleRemoveTask(task.id)}>Remove</button>
+                  <button className= 'editBtn' onClick={() => handleEditTask(task)}>Edit</button>
+                </div>
+              </li>
+            ))}
+          </ul>  
         </div>
         <div>
           <h2>Category Manager</h2>
           <ul className='categories'>
-          {categories.map(category => (
-            <li className='categoriesList' key={category.id}>
-              {category.name}
-              <button className='removeBtn' onClick={() => handleRemoveCategory(category.id)}>Remove</button>
-            </li>
-          ))}
-        </ul>
+            {categories.map(category => (
+              <li className='categoriesList' key={category.id}>
+                {category.name}
+                <button className='removeBtn' onClick={() => handleRemoveCategory(category.id)}>Remove</button>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
